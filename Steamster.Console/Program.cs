@@ -1,15 +1,15 @@
-using Steamster.Api.Api.Models;
-using Steamster.Output.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Steamster.Output
 {
+    using Steamster.Console.Services;
+    using Steamster.Output.Services;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class Program
     {
+        static Random rnd = new Random();
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Steamster!");
@@ -23,7 +23,19 @@ namespace Steamster.Output
             try
             {
                 //callWebApi().Wait();
-               GetGameResults(apiKey,userKey).Wait();
+                //GetGameResults(apiKey,userKey).Wait();
+                while (true)
+                {
+                    Console.WriteLine("Getting Random Game...");
+                    GetRandomGame(apiKey, userKey).Wait();
+
+                    Console.WriteLine("----------------");
+                    Console.WriteLine("All Done!!");
+                    Console.WriteLine("----------------");
+
+                    Console.ReadLine();
+                }
+
             }
             catch (Exception ex)
             {
@@ -35,6 +47,41 @@ namespace Steamster.Output
             Console.WriteLine("All Done!!");
             Console.WriteLine("----------------");
 
+            Console.ReadLine();
+        }
+
+        private static async Task GetRandomGame(string apiKey, string userKey)
+        {
+            var command = new GetUsersGames(apiKey, userKey);
+            var results = await command.ExecuteAsync();
+
+            var command2 = new GetGames(apiKey);
+
+            var appIds = results.response.games.Select(x => x.appid).ToList();
+
+            //One Route
+            int r = rnd.Next(appIds.Count);
+
+            var id = appIds[r];
+
+            command2.SetAppId(id);
+
+            var game = await command2.ExecuteAsync().ConfigureAwait(false);
+
+            Console.WriteLine($"Random Game Name - {game.game.gameName} ,app_id - {id}");
+
+            //MessageBox.Show((string)list[r]);
+
+            //int index = 1;
+            //foreach (var result in results.response.games)
+            //{
+            //    command2.SetAppId(result.appid);
+
+            //    var game = await command2.ExecuteAsync().ConfigureAwait(false);
+
+            //    Console.WriteLine($"Game {index}: appName - {game.game.gameName} ,app_id - {result.appid}, playtime_forever - {result.playtime_forever}");
+            //    index++;
+            //}
         }
 
         private static async Task GetGameResults(string apiKey,string userKey)
@@ -42,10 +89,15 @@ namespace Steamster.Output
             var command = new GetUsersGames(apiKey,userKey);
             var results = await command.ExecuteAsync();
 
+            var command2 = new GetGames(apiKey);
             int index = 1;
             foreach (var result in results.response.games)
             {
-                Console.WriteLine($"Game {index}: app_id - {result.appid}, playtime_forever - {result.playtime_forever}");
+                command2.SetAppId(result.appid);
+
+                var game = await command2.ExecuteAsync().ConfigureAwait(false);
+
+                Console.WriteLine($"Game {index}: appName - {game.game.gameName} ,app_id - {result.appid}, playtime_forever - {result.playtime_forever}");
                 index++;
             }
 

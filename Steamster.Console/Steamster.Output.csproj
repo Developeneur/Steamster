@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\GetGames.cs" />
     <Compile Include="Services\GetUsersGames.cs" />
   </ItemGroup>
   <ItemGroup>
