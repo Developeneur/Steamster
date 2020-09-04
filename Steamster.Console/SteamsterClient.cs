@@ -33,7 +33,7 @@ namespace Steamster.Console
 
                 //callWebApi().Wait();
                 //GetGameResults(apiKey,userKey).Wait();
-                while (true)
+                while (success)
                 {
                     Console.WriteLine("Getting Random Game...");
                     await GetRandomGame(_apiKey, _userId).ConfigureAwait(false);

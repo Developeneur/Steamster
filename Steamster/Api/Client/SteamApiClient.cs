@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Steamster.Api.Api.Interfaces;
 
@@ -100,7 +101,10 @@ namespace Steamster.Api.Api.Client
         //}
         public async Task<bool> SignIn(string userId)
         {
-            var userInfo = await _steamUserApi.GetPlayerSummaries(ApiKey,new List<string>{userId});
+            //var games = await GetUsersGames(userId).ConfigureAwait(false);
+
+            //return games.response.games.Any();
+            var userInfo = await _steamUserApi.GetPlayerSummaries(ApiKey, new List<string> { userId });
 
             return userInfo.Any();
         }

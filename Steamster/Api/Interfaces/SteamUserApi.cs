@@ -16,6 +16,7 @@ namespace Steamster.Api.Api.Interfaces
         private readonly HttpClient _httpClient;
         public SteamUserApi(HttpClient httpClient, string apiKey)
         {
+            _apiKey = apiKey;
             _httpClient = httpClient;
         }
 
@@ -28,8 +29,6 @@ namespace Steamster.Api.Api.Interfaces
                 //TODO: Make this into an extension method that checks for null values
                 var path = $"{RouteRoot}{callRoute}?key={_apiKey}&steamids={userIds.FirstOrDefault()}&format=json";
                 HttpResponseMessage response = await _httpClient.GetAsync(path).ConfigureAwait(false);
-
-
                 if (!response.IsSuccessStatusCode)
                 {
                     return new List<SteamPlayerSummary>();
@@ -37,9 +36,9 @@ namespace Steamster.Api.Api.Interfaces
 
                 var dataAsString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                var  results = JsonConvert.DeserializeObject<IEnumerable<SteamPlayerSummary>>(dataAsString);
+                var results = JsonConvert.DeserializeObject<SteamPlayerSummaryData>(dataAsString);
 
-                return results;
+                return results.response.players;
             }
             catch (Exception e)
             {

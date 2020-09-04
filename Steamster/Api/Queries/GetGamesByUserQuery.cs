@@ -26,7 +26,7 @@ namespace Steamster.Api.Queries
             try
             {
                 //TODO: Make this into an extension method that checks for null values
-                var path = $"IPlayerService/GetOwnedGames/v0001/?key={_apiKey}&steamid={SteamIds.DevelopeneurSteamId}&format=json";
+                var path = $"IPlayerService/GetOwnedGames/v0001/?key={_apiKey}&steamid={_userSteamId}&format=json";
 
                 HttpResponseMessage response = await SteamClient.GetAsync(path).ConfigureAwait(false);
 

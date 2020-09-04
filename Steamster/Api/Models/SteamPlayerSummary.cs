@@ -22,13 +22,15 @@ namespace Steamster.Api.Api.Models
 
         public string AVatarHash { get; set; }
 
-        public DateTime LastLogOff { get; set; }
+        //public DateTime LastLogOff { get; set; }
+        public string LastLogOff { get; set; }
 
         public int PersonaState { get; set; }
 
         public string PrimaryClanId { get; set; }
 
-        public DateTime TimeCreated { get; set; }
+        //public DateTime TimeCreated { get; set; }
+        public string TimeCreated { get; set; }
 
         public int PersonaStateFlags { get; set; }
     }
