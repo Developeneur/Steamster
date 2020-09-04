@@ -2,17 +2,21 @@
 using Steamster.Api.Api.Queries;
 using Steamster.Api.Queries;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Steamster.Api.Api.Interfaces;
 
 namespace Steamster.Api.Api.Client
 {
-    public class SteamApiClient
+    public class SteamApiClient : ISteamApiClient
     {
         static HttpClient client;
-
-        public string ApiKey { get; }
+        private readonly ISteamUserApi _steamUserApi;
+        private readonly IPlayerServiceApi _playerServiceApi;
+            public string ApiKey { get; }
 
         public SteamApiClient(string apiKey)
         {
@@ -26,6 +30,10 @@ namespace Steamster.Api.Api.Client
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _steamUserApi = new SteamUserApi(client,ApiKey);
+            _playerServiceApi = new PlayerServiceApi(client,ApiKey);
+            //_steamUserStatsApi = new SteamUserApi(client);
         }
 
         public async Task<GameData> GetGameData(int appId)
@@ -90,5 +98,11 @@ namespace Steamster.Api.Api.Client
         //        };
         //    }
         //}
+        public async Task<bool> SignIn(string userId)
+        {
+            var userInfo = await _steamUserApi.GetPlayerSummaries(ApiKey,new List<string>{userId});
+
+            return userInfo.Any();
+        }
     }
 }
