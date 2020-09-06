@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Steamster.Api.Api.Client;
+using Steamster.Api.Api.Models;
 using Steamster.Console.Services;
 using Steamster.Output.Services;
 
@@ -14,6 +15,7 @@ namespace Steamster.Console
         static Random rnd = new Random();
         private  SteamApiClient _steamApiClient;
 
+        private UserGameListData _userGameList;
         private string _apiKey;
         private string _userId;
         public SteamsterClient()
@@ -88,35 +90,32 @@ namespace Steamster.Console
         private  async Task GetRandomGame(string apiKey, string userId)
         {
             //var command = new GetUsersGames(apiKey, userId);
-            var results = await _steamApiClient.GetUsersGames(userId).ConfigureAwait(false);
+            if (_userGameList == null)
+            {
+                _userGameList = await _steamApiClient.GetUsersGames(userId).ConfigureAwait(false);
+            }
 
             var command2 = new GetGames(apiKey);
 
-            var appIds = results.response.games.Select(x => x.appid).ToList();
+            GameData game;
+            int id; 
 
-            //One Route
-            int r = rnd.Next(appIds.Count);
-            //TODO: Filter results
-            var id = appIds[r];
+            do
+            {
+                var appIds = _userGameList.response.games.Select(x => x.appid).ToList();
 
-            command2.SetAppId(id);
+                //One Route
+                int r = rnd.Next(appIds.Count);
+                //TODO: Filter results
+                 id = appIds[r];
 
-            var game = await command2.ExecuteAsync().ConfigureAwait(false);
+                command2.SetAppId(id);
+
+                game = await command2.ExecuteAsync().ConfigureAwait(false);
+            } while (game.game.gameName == null);
+
 
             Console.WriteLine($"Random Game Name - {game.game.gameName} ,app_id - {id}");
-
-            //MessageBox.Show((string)list[r]);
-
-            //int index = 1;
-            //foreach (var result in results.response.games)
-            //{
-            //    command2.SetAppId(result.appid);
-
-            //    var game = await command2.ExecuteAsync().ConfigureAwait(false);
-
-            //    Console.WriteLine($"Game {index}: appName - {game.game.gameName} ,app_id - {result.appid}, playtime_forever - {result.playtime_forever}");
-            //    index++;
-            //}
         }
 
         private static async Task GetGameResults(string apiKey, string userKey)
