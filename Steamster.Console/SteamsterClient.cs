@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Steamster.Api.Api.Client;
 using Steamster.Api.Api.Models;
@@ -108,10 +107,25 @@ namespace Steamster.Console
                 int r = rnd.Next(appIds.Count);
                 //TODO: Filter results
                  id = appIds[r];
-
+                 var gameToRemove = _userGameList.response.games.FirstOrDefault(x => x.appid == id);
                 command2.SetAppId(id);
 
                 game = await command2.ExecuteAsync().ConfigureAwait(false);
+
+                if (game.game.gameName == null)
+                {
+                    //REmove app id from list
+                    var removed = _userGameList.response.games.Remove(gameToRemove);
+                    if (removed)
+                    {
+                        Console.WriteLine($"INFO: App Id resulted in a null game name. Game Removed From List AppId: {id}");
+                    }
+                    
+                }
+                if (game.game.gameName == "")
+                {
+                    Console.WriteLine($"INFO: App Id resulted in a game name of \"\". Game NOT Removed From List AppId: {id}");
+                }
             } while (game.game.gameName == null);
 
 
